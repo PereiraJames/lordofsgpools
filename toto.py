@@ -76,7 +76,7 @@ def insertTotoNumbers(AllData):
     results = webscrapeSite(AllData)
 
     if results == {}:
-        print("No Updates.")
+        print("No Updates...")
         return
 
     for result in results:
@@ -152,11 +152,14 @@ def getLatestDrawDetails():
         "winNo" : winning_numbers,
         "bonusNo" : bonus_number
     }
-
+    print("")
+    print("#" * 50)
     print(f"Draw No: {DrawNumber}")
     print(f"Draw Date: {DrawDate}")
     print(f"Winning Numbers: {winning_numbers}")
     print(f"Bonus Number: {bonus_number}")
+    print("#" * 50)
+    print("")
 
     return latestDrawDetails
 
@@ -191,17 +194,18 @@ def calcuateNumberFrequency():
 
 
 
-def getLucky():
+def getLucky(printing=False):
     numberFrequency = calcuateNumberFrequency()
     latestDrawNumber = getLatestToToDrawNumber()
 
     sortNumbers = sorted(numberFrequency, key=numberFrequency.get)
 
-    print(len(sortNumbers))
-
     lowFreqNumbers = sortNumbers[:7]
     highFreqNumbers = sortNumbers[-7:]
     secondFreqNumbers = sortNumbers[-14:-7]
+
+    if printing == False:
+        return [highFreqNumbers, secondFreqNumbers, lowFreqNumbers]
 
     print(f"As of Draw No.: {latestDrawNumber}")
 
@@ -215,15 +219,53 @@ def getLucky():
 
 # insertTotoNumbers(False)
 
-def validateWin(State="Default"):
-    ##### FORGOT THIS
-    if State == "Default":
-        defaultNumbers = getLucky()
+def validateWin(tickets=[]):
 
-        highFreqNumbers = defaultNumbers[0]
-        secondFreqNumbers = defaultNumbers[1]
-        lowFreqNumbers = defaultNumbers[2]
+    drawDetails = getLatestDrawDetails()
+
+    draw_winningNumbers = drawDetails['winNo']
+    draw_bonusNumbers = drawDetails['bonusNo']
+    
+    if tickets == []:
+
+        print("Validating Generated Numbers...")
+        defaultNumbers = getLucky()
+    
+        for num in range(0,len(defaultNumbers)):
+            results = checkTicket(defaultNumbers[num], draw_winningNumbers, draw_bonusNumbers)
+            if num == 0:
+                print(f"Results of the Highest Frequency: {results} | {defaultNumbers[num]}")
+            elif num == 1:
+                print(f"Results of the Second Highest Frequency: {results} | {defaultNumbers[num]}")
+            elif num == 2:
+                print(f"Results of the Lowested Frequency: {results} | {defaultNumbers[num]}")
+            else:
+                print("Something happened")
+                print(results)
+                print(defaultNumbers[num])
+    else:
+        for ticket in tickets:
+            print("Validing Ticket...")
+
+            results = checkTicket(ticket, draw_winningNumbers, draw_bonusNumbers)
+            print(f"Result of Ticket: {results} | {ticket}")
+
+def checkTicket(ticketnumbers, winningnumbers, bonusnumber):
+    
+    count = 0.0
+
+    for number in ticketnumbers:
+        if number in winningnumbers:
+            count += 1
+        if number == bonusnumber:
+            count += 0.5
+
+    return count
 
 
 # getLucky()
-getLatestDrawDetails()
+validateWin()
+# validateWin([['3', '10', '13', '29', '32', '46'],['3', '10', '13', '29', '32', '46'],['3', '10', '13', '29', '32', '46'],['3', '10', '13', '29', '32', '46'],['3', '10', '13', '29', '32', '46'],['3', '10', '13', '29', '32', '46'],['3', '10', '13', '29', '32', '46']])
+# validateWin([['3', '10', '13', '29', '32', '46','18']])
+# checkTicket(['3', '10', '13', '29', '32', '46'], ['3', '10', '13', '29', '32', '46'], 18)
+
